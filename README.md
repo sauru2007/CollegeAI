@@ -52,6 +52,12 @@ The assistant retrieves relevant information using Retrieval Augmented Generatio
 
 # 🖥️ Screenshots
 
+## Login Page
+
+![](screenshots/login-dark.png)
+
+---
+
 ## Dashboard
 
 ![Dashboard](screenshots/dashboard.png)
@@ -61,6 +67,18 @@ The assistant retrieves relevant information using Retrieval Augmented Generatio
 ## AI Chat Interface
 
 ![Chat](screenshots/chat.png)
+
+---
+
+## Document Analysis
+
+![](screenshots/document-chat.png)
+
+---
+
+## Light Theme
+
+![](screenshots/dashboard-light.png)
 
 ---
 
