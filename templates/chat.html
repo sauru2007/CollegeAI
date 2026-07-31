@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College AI Assistant</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Highlight.js CSS for elegant code themes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+
+  <!-- Tailwind CSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              light: '#4f46e5', // INDIGO-600
+              dark: '#6366f1',  // INDIGO-500
+              hoverLight: '#4338ca',
+              hoverDark: '#4f46e5',
+            },
+            canvas: {
+              light: '#f3f4f6', // GRAY-100
+              dark: '#0b1220',  // Custom dark blue-gray
+            },
+            panel: {
+              light: '#ffffff', // Clean white
+              dark: '#0f172a',  // SLATE-900
+            },
+            sidebar: {
+              light: '#f9fafb', // GRAY-50
+              dark: '#090d16',  // Custom ultra dark
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Absolute smooth scroll & custom high-end scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e5e7eb;
+      border-radius: 9999px;
+    }
+    .dark ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d1d5db;
+    }
+
+    /* Custom styles for rendered markdown elements inside chat answers */
+    .markdown-content p {
+      margin-bottom: 0.75rem;
+      line-height: 1.625;
+    }
+    .markdown-content p:last-child {
+      margin-bottom: 0px;
+    }
+    .markdown-content ul, .markdown-content ol {
+      margin-left: 1.5rem;
+      margin-bottom: 0.75rem;
+      list-style-position: outside;
+    }
+    .markdown-content ul {
+      list-style-type: disc;
+    }
+    .markdown-content ol {
+      list-style-type: decimal;
+    }
+    .markdown-content li {
+      margin-bottom: 0.25rem;
+    }
+    .markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4 {
+      font-weight: 700;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.25;
+    }
+    .markdown-content h1 { font-size: 1.5rem; }
+    .markdown-content h2 { font-size: 1.25rem; }
+    .markdown-content h3 { font-size: 1.125rem; }
+    
+    /* Elegant Markdown Table Styling */
+    .markdown-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.875rem;
+      overflow-x: auto;
+      display: block;
+    }
+    .markdown-content th {
+      font-weight: 600;
+      background-color: rgba(79, 70, 229, 0.08);
+      border: 1px solid #e5e7eb;
+      padding: 0.625rem 0.875rem;
+      text-align: left;
+    }
+    .dark .markdown-content th {
+      background-color: rgba(99, 102, 241, 0.15);
+      border-color: #334155;
+    }
+    .markdown-content td {
+      border: 1px solid #e5e7eb;
+      padding: 0.625rem 0.875rem;
+    }
+    .dark .markdown-content td {
+      border-color: #334155;
+    }
+    .markdown-content tr:nth-child(even) {
+      background-color: rgba(243, 244, 246, 0.5);
+    }
+    .dark .markdown-content tr:nth-child(even) {
+      background-color: rgba(15, 23, 42, 0.5);
+    }
+
+    /* Code block container layout */
+    .code-container {
+      position: relative;
+      margin: 1rem 0;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      background-color: #1e293b;
+      color: #94a3b8;
+      font-family: monospace;
+      font-size: 0.75rem;
+      border-bottom: 1px solid #334155;
+    }
+    .code-header button {
+      transition: color 0.15s ease-in-out;
+    }
+    .code-header button:hover {
+      color: #f8fafc;
+    }
+    
+    /* Typing bubble custom animation */
+    @keyframes bounce-slow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .dot-animation {
+      animation: bounce-slow 1s infinite ease-in-out;
+    }
+    .dot-animation:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .dot-animation:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    /* Glassmorphic elements shading */
+    body {
+      background-color: #f3f4f6;
+      background-image: radial-gradient(circle at 0% 0%, #e0e7ff 0%, transparent 50%), radial-gradient(circle at 100% 100%, #e2e8f0 0%, transparent 50%);
+    }
+    .dark body {
+      background-color: #0b1220; 
+      background-image: radial-gradient(circle at 0% 0%, #1e1b4b 0%, transparent 50%), radial-gradient(circle at 100% 100%, #1e293b 0%, transparent 50%);
+    }
+
+    .glassmorphism {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .dark .glassmorphism {
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .glass-sidebar {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .dark .glass-sidebar {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-header {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .dark .glass-header {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    /* Toast overlay animations */
+    @keyframes slide-in-up {
+      0% { transform: translateY(100%) translateX(-50%); opacity: 0; }
+      100% { transform: translateY(0) translateX(-50%); opacity: 1; }
+    }
+    .animate-toast {
+      animation: slide-in-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="text-slate-800 dark:text-slate-100 font-sans transition-colors duration-300 antialiased overflow-hidden h-screen flex flex-col">
+
+  <!-- Modern Interactive Notification Toast -->
+  <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glassmorphism px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border animate-toast max-w-sm w-[90%]">
+    <div id="toast-icon" class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm bg-brand-light dark:bg-brand-dark">
+      <i class="fa-solid fa-info"></i>
+    </div>
+    <div class="flex-1">
+      <p id="toast-message" class="text-xs font-medium text-slate-800 dark:text-slate-200">System Notification</p>
+    </div>
+    <button onclick="closeToast()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 transition-colors">
+      <i class="fa-solid fa-xmark text-sm"></i>
+    </button>
+  </div>
+
+  <!-- Primary Outer Container -->
+  <div class="flex h-full w-full relative overflow-hidden" id="app-viewport">
+    
+    <!-- MOBILE BOTTOM / TOP NAVIGATION BAR TRIGGER -->
+    <div class="md:hidden flex items-center justify-between px-4 py-3 bg-panel-light dark:bg-panel-dark border-b border-gray-200 dark:border-gray-800 w-full absolute top-0 left-0 right-0 z-30 shadow-sm">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-md">
+          <i class="fa-solid fa-graduation-cap text-base"></i>
+        </div>
+        <span class="text-sm font-bold bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">College AI</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="toggleMobileSidebar()" class="p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- LEFT SIDEBAR -->
+    <aside id="sidebar-container" class="fixed inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 md:relative md:flex flex-col w-[280px] h-full bg-sidebar-light dark:bg-sidebar-dark border-r border-gray-200/80 dark:border-slate-800/80 transition-transform duration-300 ease-in-out shadow-lg md:shadow-none">
+      
+      <!-- Brand Logo / Identity Header -->
+      <div class="p-5 flex items-center justify-between border-b border-gray-200/60 dark:border-slate-800/60">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+            <i class="fa-solid fa-graduation-cap text-xl"></i>
+          </div>
+          <div>
+            <h1 class="text-md font-bold tracking-tight bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-500 dark:from-indigo-400 dark:via-indigo-300 dark:to-purple-300 bg-clip-text text-transparent">College AI</h1>
+            <p class="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-semibold">Campus Companion</p>
+          </div>
+        </div>
+        
+        <!-- Mobile Sidebar Close Trigger -->
+        <button onclick="toggleMobileSidebar()" class="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-gray-100 dark:bg-slate-800">
+          <i class="fa-solid fa-chevron-left text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Main Action: New Chat & Action Deck -->
+      <div class="p-4 flex flex-col gap-3">
+        <button onclick="createNewChat()" id="btn-new-chat" class="w-full py-3 px-4 rounded-xl font-medium text-sm text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-md shadow-indigo-600/10 hover:shadow-indigo-600/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span>New Chat</span>
+        </button>
+      </div>
+
+      <!-- Selectors & Controls Section: Scrollable area -->
+      <div class="flex-1 overflow-y-auto px-4 py-2 space-y-4">
+        
+        <!-- Persona Configurator Card -->
+        <div class="bg-panel-light dark:bg-panel-dark/40 border border-gray-200/50 dark:border-slate-800/40 p-3.5 rounded-2xl shadow-sm">
+          <label class="block text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase mb-2">
+            <i class="fa-solid fa-user-astronaut mr-1.5 text-indigo-500"></i> Assistant Persona
+          </label>
+          <div class="relative">
+            <select id="personality-select" onchange="onConfigChange()" class="w-full pl-3 pr-10 py-2.5 rounded-xl border border-gray-200 dark:border-slate-800 bg-canvas-light/55 dark:bg-slate-900/40 text-xs font-semibold focus:border-indigo-500 focus:outline-none appearance-none cursor-pointer text-slate-700 dark:text-slate-200">
+              <option value="Mentor" data-icon="fa-chalkboard-user">🎓 Mentor (Academic Guide)</option>
+              <option value="Academic Tutor" data-icon="fa-book">📖 Academic Tutor (Concepts/Vivas)</option>
+              <option value="Placement Coach" data-icon="fa-briefcase">💼 Placement Coach (Jobs/Careers)</option>
+              <option value="Friend" data-icon="fa-face-laugh-beam">🍿 Friend (Casual College Chat)</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+              <i class="fa-solid fa-chevron-down text-[10px]"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Objective Exam Mode Selector Card -->
+        <div class="bg-panel-light dark:bg-panel-dark/40 border border-gray-200/50 dark:border-slate-800/40 p-3.5 rounded-2xl shadow-sm">
+          <label class="block text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase mb-2">
+            <i class="fa-solid fa-laptop-code mr-1.5 text-indigo-500"></i> Assessment Mode
+          </label>
+          <div class="relative">
+            <select id="exam-mode-select" onchange="onConfigChange()" class="w-full pl-3 pr-10 py-2.5 rounded-xl border border-gray-200 dark:border-slate-800 bg-canvas-light/55 dark:bg-slate-900/40 text-xs font-semibold focus:border-indigo-500 focus:outline-none appearance-none cursor-pointer text-slate-700 dark:text-slate-200">
+              <option value="General Chat">🌐 General Chat</option>
+              <option value="2 Marks">📝 Short Q&A (2 Marks)</option>
+              <option value="5 Marks">✏️ Comprehensive Response (5 Marks)</option>
+              <option value="10 Marks">🏆 Deep Analytical Essay (10 Marks)</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+              <i class="fa-solid fa-chevron-down text-[10px]"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Context Document (PDF Uploder Interface) -->
+        <div id="pdf-container-card" class="bg-panel-light dark:bg-panel-dark/40 border border-gray-200/50 dark:border-slate-800/40 p-3.5 rounded-2xl shadow-sm flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <label class="block text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase">
+              <i class="fa-solid fa-file-invoice mr-1.5 text-indigo-500"></i> Course Reference
+            </label>
+          </div>
+          
+          <!-- File Input Hidden -->
+          <input type="file" id="pdf-file-input" accept=".pdf" class="hidden" onchange="handleFileUpload(event)">
+          
+          <!-- Trigger Action -->
+          <button onclick="triggerFileInput()" id="upload-trigger-btn" class="w-full py-2.5 px-3 border border-dashed border-gray-300 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 bg-canvas-light/30 dark:bg-slate-900/20 hover:bg-canvas-light/80 dark:hover:bg-slate-900/60 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300">
+            <i class="fa-solid fa-cloud-arrow-up text-xs text-slate-400"></i>
+            <span>Upload Syllabus / PDF</span>
+          </button>
+
+          <!-- Upload Status View (Hidden Dynamically) -->
+          <div id="upload-status-box" class="hidden flex flex-col gap-2 p-2.5 rounded-xl border border-dashed bg-slate-50 dark:bg-slate-900/40 text-xs border-indigo-100 dark:border-indigo-950">
+            <div class="flex items-center justify-between overflow-hidden">
+              <div class="flex items-center gap-2 overflow-hidden mr-2">
+                <i class="fa-solid fa-file-pdf text-red-500 text-sm flex-shrink-0"></i>
+                <span id="uploaded-filename" class="font-medium text-slate-700 dark:text-slate-300 truncate">document.pdf</span>
+              </div>
+              <button onclick="clearUploadedFile()" class="p-1 rounded text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors flex-shrink-0" title="Remove reference document">
+                <i class="fa-solid fa-trash-can text-[10px]"></i>
+              </button>
+            </div>
+            
+            <!-- Progress Line Indicator -->
+            <div id="upload-progress-bar-container" class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+              <div id="upload-progress-fill" class="bg-gradient-to-r from-indigo-500 to-violet-600 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <!-- Upload Meta Label -->
+            <div class="flex justify-between items-center text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+              <span id="upload-meta-status">Initializing...</span>
+              <span id="upload-percent-value">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat History List Container -->
+        <div class="mt-4 flex flex-col gap-2">
+          <label class="block text-[11px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase px-1">
+            <i class="fa-solid fa-clock-rotate-left mr-1.5 text-indigo-400"></i> Recent Chats
+          </label>
+          <div id="chat-history-list" class="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
+            <!-- Dynamic list -->
+            <p class="text-center text-[11px] text-slate-400 dark:text-slate-500 py-3 italic">No recent chats</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Utilities Footer Deck -->
+      <div class="p-4 border-t border-gray-200/60 dark:border-slate-800/60 flex flex-col gap-2">
+        
+        <!-- Toggle Theme (Dark / Light) -->
+        <button onclick="toggleTheme()" class="w-full py-2.5 px-3 bg-panel-light dark:bg-panel-dark hover:bg-gray-100 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-800 rounded-xl flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 transition-all cursor-pointer">
+          <div class="flex items-center gap-2.5">
+            <i id="theme-toggle-icon" class="fa-solid fa-moon text-indigo-500 w-4 text-center"></i>
+            <span id="theme-toggle-label">Dark Appearance</span>
+          </div>
+          <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Alt</span>
+        </button>
+
+        <!-- Back To Dashboard -->
+        <a href="/dashboard" class="w-full py-2.5 px-3 bg-panel-light dark:bg-panel-dark hover:bg-red-50 dark:hover:bg-red-950/20 border border-gray-200 dark:border-slate-800 hover:border-red-200 dark:hover:border-red-900/30 rounded-xl flex items-center gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition-all">
+          <i class="fa-solid fa-circle-chevron-left text-indigo-500 hover:text-red-500 transition-colors w-4 text-center"></i>
+          <span>Dashboard</span>
+        </a>
+        
+      </div>
+    </aside>
+
+    <!-- Overlay backdrop for mobile sidebars -->
+    <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="hidden md:hidden fixed inset-0 bg-slate-950/50 z-30 transition-opacity"></div>
+
+    <!-- MAIN CHAT AREA -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-canvas-light/40 dark:bg-canvas-dark/30 pt-[60px] md:pt-0">
+      
+      <!-- STICKY TOP HEADER -->
+      <header class="h-16 border-b border-gray-200/60 dark:border-slate-800/60 bg-panel-light/80 dark:bg-panel-dark/80 backdrop-blur-md px-6 flex items-center justify-between z-20 flex-shrink-0 shadow-sm">
+        <div class="flex items-center gap-3 overflow-hidden">
+          <div class="flex-shrink-0 w-3 h-3 rounded-full bg-emerald-500 animate-pulse" id="status-ledger-light"></div>
+          <div>
+            <h2 id="current-chat-title" class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight truncate">New Study Session</h2>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span id="current-status-text" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Assistant is Ready</span>
+              <span class="text-slate-300 dark:text-slate-700 text-[10px]">&bull;</span>
+              <span id="current-meta-indicators" class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Mentor / General</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Utility controls in header -->
+        <div class="flex items-center gap-2">
+          <!-- Clear Conversation Button -->
+          <button onclick="resetConversation()" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-250 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer" title="Reset Session Screen">
+            <i class="fa-solid fa-arrow-rotate-left text-sm"></i>
+          </button>
+          
+          <button id="header-pdf-badge" class="hidden px-2.5 py-1 text-[10px] font-bold bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 rounded-lg flex items-center gap-1.5 border border-indigo-100 dark:border-indigo-900/40">
+            <i class="fa-solid fa-file-arrow-up text-[10px]"></i>
+            <span id="header-pdf-name">document.pdf</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- SCROLLABLE CHAT ENGINE CONTAINER -->
+      <section id="chat-messages-container" class="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6 flex flex-col justify-start">
+        
+        <!-- WELCOME CONTAINER screen (visible when list is empty) -->
+        <div id="welcome-prompter" class="max-w-2xl mx-auto my-auto py-12 flex flex-col items-center justify-center text-center space-y-8 animate-fade-in w-full">
+          
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/10">
+            <i class="fa-solid fa-graduation-cap text-3xl"></i>
+          </div>
+
+          <div class="space-y-2">
+            <h3 class="text-xl md:text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
+              Welcome to <span class="bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-purple-300 bg-clip-text text-transparent">College AI</span>
+            </h3>
+            <p class="text-xs md:text-sm text-slate-400 dark:text-slate-400 max-w-lg leading-relaxed">
+              Your personalized campus co-pilot. I can analyze course materials, solve exam worksheets, and offer tailored academic counseling of your absolute preference.
+            </p>
+          </div>
+
+          <!-- Dynamic Prompts Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 w-full max-w-xl text-left mt-4" id="prompts-grid-dynamic">
+            <!-- Dynamic prompt items injected via JavaScript based on chosen personality/mode selection -->
+          </div>
+          
+        </div>
+
+        <!-- DIALOG STREAM CONTAINER (Injected items go here) -->
+        <div id="dialog-root" class="space-y-6 w-full max-w-3xl mx-auto flex flex-col justify-start"></div>
+
+        <!-- TYPING ANIMATION (Visible when AI is computing) -->
+        <div id="ai-loading-indicator" class="hidden w-full max-w-3xl mx-auto flex items-start gap-4">
+          <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-indigo-500/10 dark:bg-indigo-400/10 border border-indigo-200/30 dark:border-indigo-800/30 flex items-center justify-center text-indigo-600 dark:text-indigo-450 shadow-sm">
+            <i class="fa-solid fa-graduation-cap text-sm"></i>
+          </div>
+          <div class="flex-1 space-y-2">
+            <div class="glassmorphism p-4 rounded-2xl inline-block shadow-sm">
+              <div class="flex items-center gap-1.5 py-1 px-2.5">
+                <span class="w-2.5 h-2.5 bg-indigo-500/70 rounded-full dot-animation"></span>
+                <span class="w-2.5 h-2.5 bg-indigo-500/70 rounded-full dot-animation"></span>
+                <span class="w-2.5 h-2.5 bg-indigo-500/70 rounded-full dot-animation"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- FIXED BOTTOM DESIGN INPUT BAR -->
+      <footer class="p-4 md:p-6 bg-gradient-to-t from-canvas-light via-canvas-light to-transparent dark:from-canvas-dark dark:via-canvas-dark dark:to-transparent flex-shrink-0 sticky bottom-0 z-20">
+        <div class="max-w-3xl mx-auto flex flex-col gap-2">
+          
+          <!-- Primary Form Context Frame -->
+          <form id="chat-form" onsubmit="handleChatSubmit(event)" class="relative p-2 rounded-2xl shadow-xl border border-gray-200 dark:border-slate-800/80 bg-panel-light dark:bg-panel-dark/95 focus-within:ring-2 focus-within:ring-indigo-500/50 focus-within:border-indigo-500 transition-all flex flex-col gap-2">
+            
+            <div class="flex items-start w-full relative">
+              <!-- Rich auto-resizable text field -->
+              <textarea id="chat-input" rows="1" placeholder="Ask your College AI Assistant..." oninput="resizeTextarea()" onkeydown="handleTextareaKeydown(event)" class="w-full resize-none border-0 bg-transparent text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-0 focus:outline-none focus:border-transparent text-sm leading-relaxed px-3 py-2 flex items-center h-auto min-h-[40px] max-h-[140px] focus:outline-none"></textarea>
+            </div>
+            
+            <!-- Controls Deck inside prompt bar -->
+            <div class="flex items-center justify-between px-3 py-1 border-t border-gray-100 dark:border-slate-800/40 mt-1">
+              
+              <!-- Left Action badging counters -->
+              <div class="flex items-center gap-2">
+                <!-- PDF upload toggle quick shortcuts -->
+                <button type="button" onclick="triggerFileInput()" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer flex items-center justify-center gap-1.5" title="Attach Document Context">
+                  <i class="fa-solid fa-paperclip text-sm"></i>
+                  <span id="input-clip-indicator" class="hidden text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/20 px-1.5 py-0.5 rounded text-indigo-600 dark:text-indigo-400">PDF ACTIVE</span>
+                </button>
+                <span class="text-xs text-slate-400 dark:text-slate-500 font-medium" id="char-counter">0 / 2000</span>
+              </div>
+              
+              <!-- Finalize Submit Button -->
+              <button type="submit" id="submit-btn" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center font-bold">
+                <i class="fa-solid fa-paper-plane text-sm"></i>
+              </button>
+            </div>
+
+          </form>
+
+          <!-- Caution footnote notification -->
+          <p class="text-[10.5px] text-center text-slate-400 dark:text-slate-500 leading-normal max-w-lg mx-auto">
+            College AI can compose content. Highlight concepts or reference course structures. Double check crucial exam listings.
+          </p>
+
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- Marked Markdown Parser CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+  <!-- Highlight JS CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
+  <!-- APP LOGIC CODE ENGINE -->
+  <script>
+    // Local Session and State Management
+    let chatHistory = JSON.parse(localStorage.getItem('col_ai_history') || '[]');
+    let currentSessionId = localStorage.getItem('col_ai_current_session_id') || '';
+    let currentMessages = [];
+    let isAILoading = false;
+    let uploadedFileDetails = JSON.parse(localStorage.getItem('col_ai_uploaded_file') || 'null');
+
+    // Preset Prompt Library corresponding to Personality selection states
+    const promptPresets = {
+      "Mentor": [
+        { text: "Recommend a semester project idea for a Smart City IoT model.", icon: "fa-seedling" },
+        { text: "Outline typical career routes for major cloud computing certifications.", icon: "fa-compass" },
+        { text: "How should I structure my tech resume for engineering placements?", icon: "fa-id-card" }
+      ],
+      "Academic Tutor": [
+        { text: "Explain Dijkstra's shortest path algorithm with a small step-by-step example.", icon: "fa-project-diagram" },
+        { text: "Help me study for operating system concurrency questions.", icon: "fa-microchip" },
+        { text: "Design a study plan for high-performance databases.", icon: "fa-circle-question" }
+      ],
+      "Placement Coach": [
+        { text: "Give me standard technical interview coding questions asked in placement rounds.", icon: "fa-terminal" },
+        { text: "Explain how to formulate responses using the STAR method.", icon: "fa-bullseye" },
+        { text: "Draft a dynamic cover letter requesting software engineering roles.", icon: "fa-envelope-open-text" }
+      ],
+      "Friend": [
+        { text: "Tell me a joke about student engineering labs and caffeine habits.", icon: "fa-laugh" },
+        { text: "Suggest some good stress buster activities before upcoming finals week.", icon: "fa-heart" },
+        { text: "How can I balance extracurricular club leadership with hard classes?", icon: "fa-guitar" }
+      ]
+    };
+
+    // System Startup Sequence
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initChatSession();
+      renderConfigState();
+      renderHistoryList();
+      restoreUploadedFileUI();
+      resizeTextarea();
+    });
+
+    // Theme Management Engine
+    function initTheme() {
+      const storedTheme = localStorage.getItem('theme');
+      if (storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        updateThemeUIElements(true);
+      } else {
+        document.documentElement.classList.remove('dark');
+        updateThemeUIElements(false);
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateThemeUIElements(isDark);
+      showToast(isDark ? 'Dark Theme Enabled' : 'Light Theme Enabled', 'fa-moon');
+    }
+
+    function updateThemeUIElements(isDark) {
+      const icon = document.getElementById('theme-toggle-icon');
+      const label = document.getElementById('theme-toggle-label');
+      if (isDark) {
+        icon.className = 'fa-solid fa-sun text-yellow-400 w-4 text-center';
+        label.textContent = 'Light Appearance';
+      } else {
+        icon.className = 'fa-solid fa-moon text-indigo-600 w-4 text-center';
+        label.textContent = 'Dark Appearance';
+      }
+    }
+
+    // Interactive Sidebar Trigger Drawer (Mobile)
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar-container');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    // Selectors and Core Configuration Hooks
+    function onConfigChange() {
+      renderConfigState();
+      if (currentMessages.length === 0) {
+        populateWelcomePrompts();
+      }
+      saveCurrentSessionProperties();
+    }
+
+    function renderConfigState() {
+      const pSelect = document.getElementById('personality-select').value;
+      const eSelect = document.getElementById('exam-mode-select').value;
+      const indicator = document.getElementById('current-meta-indicators');
+      if (indicator) {
+        indicator.textContent = `${pSelect} / ${eSelect}`;
+      }
+    }
+
+    // Auto-resizing text fields inside ChatGPT layout
+    function resizeTextarea() {
+      const textarea = document.getElementById('chat-input');
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+      
+      // Update character counter limit representation
+      const counter = document.getElementById('char-counter');
+      counter.textContent = `${textarea.value.length} / 2000`;
+      
+      // Toggle send button accessibility
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = textarea.value.trim().length === 0 || isAILoading;
+    }
+
+    function handleTextareaKeydown(event) {
+      // Send message on Enter without shift key active
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        document.getElementById('chat-form').requestSubmit();
+      }
+    }
+
+    // Upload Reference File Interactions
+    function triggerFileInput() {
+      document.getElementById('pdf-file-input').click();
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.type !== 'application/pdf') {
+        showToast('Error: Content is not a PDF document', 'fa-triangle-exclamation');
+        return;
+      }
+
+      // Display dynamic loading status bar
+      const statusBox = document.getElementById('upload-status-box');
+      const filenameLabel = document.getElementById('uploaded-filename');
+      const fillBar = document.getElementById('upload-progress-fill');
+      const percentVal = document.getElementById('upload-percent-value');
+      const metaLabel = document.getElementById('upload-meta-status');
+      
+      statusBox.classList.remove('hidden');
+      filenameLabel.textContent = file.name;
+      fillBar.style.width = '0%';
+      percentVal.textContent = '0%';
+      metaLabel.textContent = 'Preparing Upload...';
+
+      // Assemble payload parameters
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Perform request via standard AJAX to track live progress output
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/upload', true);
+
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          fillBar.style.width = `${percent}%`;
+          percentVal.textContent = `${percent}%`;
+          metaLabel.textContent = percent < 100 ? 'Uploading Resource...' : 'Analyzing PDF Structure...';
+        }
+      });
+
+      xhr.addEventListener('readystatechange', () => {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const res = JSON.parse(xhr.responseText);
+              
+              uploadedFileDetails = {
+                filename: file.name,
+                serverPath: res.filepath || '',
+                id: res.file_id || Date.now().toString()
+              };
+              
+              localStorage.setItem('col_ai_uploaded_file', JSON.stringify(uploadedFileDetails));
+              
+              metaLabel.textContent = 'Analysis Completed!';
+              fillBar.className = 'bg-emerald-500 h-1.5 rounded-full transition-all duration-300';
+              showToast('Course Syllabus reference uploaded!', 'fa-circle-check');
+              
+              updateUploadedDocumentUIState();
+            } catch (err) {
+              handleUploadError('JSON Parsing Failure');
+            }
+          } else {
+            handleUploadError(`Status Error ${xhr.status}`);
+          }
+        }
+      });
+
+      xhr.addEventListener('error', () => {
+        handleUploadError('Network Interrupted');
+      });
+
+      xhr.send(formData);
+    }
+
+    function handleUploadError(reason) {
+      console.error('File registration aborted:', reason);
+      const metaLabel = document.getElementById('upload-meta-status');
+      const fillBar = document.getElementById('upload-progress-fill');
+      
+      metaLabel.textContent = 'Upload failed!';
+      fillBar.className = 'bg-red-500 h-1.5 rounded-full transition-all duration-300';
+      showToast('Error: Failed to process document syllabus', 'fa-triangle-exclamation');
+    }
+
+    function clearUploadedFile() {
+      uploadedFileDetails = null;
+      localStorage.removeItem('col_ai_uploaded_file');
+      
+      const fileInput = document.getElementById('pdf-file-input');
+      fileInput.value = '';
+      
+      document.getElementById('upload-status-box').classList.add('hidden');
+      updateUploadedDocumentUIState();
+      showToast('Document reference fully removed', 'fa-trash-can');
+    }
+
+    function restoreUploadedFileUI() {
+      if (uploadedFileDetails) {
+        document.getElementById('upload-status-box').classList.remove('hidden');
+        document.getElementById('uploaded-filename').textContent = uploadedFileDetails.filename;
+        const fillBar = document.getElementById('upload-progress-fill');
+        fillBar.style.width = '100%';
+        fillBar.className = 'bg-emerald-500 h-1.5 rounded-full';
+        document.getElementById('upload-meta-status').textContent = 'Document Attached';
+        document.getElementById('upload-percent-value').textContent = '100%';
+      }
+      updateUploadedDocumentUIState();
+    }
+
+    function updateUploadedDocumentUIState() {
+      const topBadge = document.getElementById('header-pdf-badge');
+      const badgeName = document.getElementById('header-pdf-name');
+      const clipIndicator = document.getElementById('input-clip-indicator');
+
+      if (uploadedFileDetails) {
+        topBadge.classList.remove('hidden');
+        badgeName.textContent = uploadedFileDetails.filename;
+        clipIndicator.classList.remove('hidden');
+      } else {
+        topBadge.classList.add('hidden');
+        clipIndicator.classList.add('hidden');
+      }
+    }
+
+    // Active Chat Sessions Management Routing
+    function initChatSession() {
+      if (!currentSessionId) {
+        createNewChat();
+      } else {
+        loadChatSession(currentSessionId);
+      }
+    }
+
+    function createNewChat() {
+      currentSessionId = 'session_' + Date.now();
+      localStorage.setItem('col_ai_current_session_id', currentSessionId);
+      currentMessages = [];
+      
+      // Update basic fields to reset layout
+      saveCurrentSessionProperties();
+      renderConfigState();
+      populateWelcomePrompts();
+      
+      const dialogRoot = document.getElementById('dialog-root');
+      dialogRoot.innerHTML = '';
+      document.getElementById('welcome-prompter').classList.remove('hidden');
+      document.getElementById('current-chat-title').textContent = 'New Study Session';
+      
+      const sidebar = document.getElementById('sidebar-container');
+      if (!sidebar.classList.contains('-translate-x-full')) {
+        toggleMobileSidebar();
+      }
+    }
+
+    function saveCurrentSessionProperties() {
+      const pValue = document.getElementById('personality-select').value;
+      const eValue = document.getElementById('exam-mode-select').value;
+      
+      let sessionIndex = chatHistory.findIndex(sh => sh.id === currentSessionId);
+      
+      const sessionMetaData = {
+        id: currentSessionId,
+        title: currentMessages.length > 0 ? getSessionTitle() : 'New Study Session',
+        personality: pValue,
+        exam_mode: eValue,
+        updated_at: Date.now(),
+        messages: currentMessages
+      };
+
+      if (sessionIndex !== -1) {
+        chatHistory[sessionIndex] = sessionMetaData;
+      } else {
+        chatHistory.unshift(sessionMetaData);
+      }
+
+      // Filter empty default sessions without messages from clogging sidebar unless it's current
+      const filtered = chatHistory.filter((sh, i) => sh.id === currentSessionId || sh.messages.length > 0);
+      chatHistory = filtered;
+
+      localStorage.setItem('col_ai_history', JSON.stringify(chatHistory));
+      renderHistoryList();
+    }
+
+    function loadChatSession(id) {
+      const targetSession = chatHistory.find(sh => sh.id === id);
+      if (!targetSession) {
+        createNewChat();
+        return;
+      }
+
+      currentSessionId = id;
+      localStorage.setItem('col_ai_current_session_id', currentSessionId);
+      
+      // Set configuration selector options to mimic stored chat states
+      document.getElementById('personality-select').value = targetSession.personality || 'Mentor';
+      document.getElementById('exam-mode-select').value = targetSession.exam_mode || 'General Chat';
+      renderConfigState();
+      
+      currentMessages = targetSession.messages || [];
+      document.getElementById('current-chat-title').textContent = targetSession.title || 'Study Session';
+      
+      // Rendering and layout updating
+      const dialogRoot = document.getElementById('dialog-root');
+      dialogRoot.innerHTML = '';
+      
+      if (currentMessages.length === 0) {
+        document.getElementById('welcome-prompter').classList.remove('hidden');
+        populateWelcomePrompts();
+      } else {
+        document.getElementById('welcome-prompter').classList.add('hidden');
+        currentMessages.forEach(msg => {
+          injectMessageUI(msg.role, msg.content, msg.timestamp, false);
+        });
+        scrollToLatestMessage();
+      }
+
+      const sidebar = document.getElementById('sidebar-container');
+      if (!sidebar.classList.contains('-translate-x-full')) {
+        toggleMobileSidebar();
+      }
+    }
+
+    function getSessionTitle() {
+      if (currentMessages.length === 0) return 'New Study Session';
+      const firstUserMsg = currentMessages.find(m => m.role === 'user');
+      if (!firstUserMsg) return 'New Study Session';
+      return firstUserMsg.content.length > 30 ? firstUserMsg.content.substring(0, 30) + '...' : firstUserMsg.content;
+    }
+
+    function renderHistoryList() {
+      const listEl = document.getElementById('chat-history-list');
+      listEl.innerHTML = '';
+      
+      // Populate historical chat sessions containing actual elements
+      const activeHistories = chatHistory.filter(h => h.messages && h.messages.length > 0);
+      
+      if (activeHistories.length === 0) {
+        listEl.innerHTML = `<p class="text-center text-[11px] text-slate-400 dark:text-slate-500 py-3 italic">No recent chats</p>`;
+        return;
+      }
+
+      activeHistories.forEach(item => {
+        const isActive = item.id === currentSessionId;
+        const activeClass = isActive 
+          ? 'bg-slate-200/80 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-semibold' 
+          : 'text-slate-600 dark:text-slate-350 hover:bg-slate-200/50 dark:hover:bg-slate-900/40 hover:text-slate-900 dark:hover:text-slate-100';
+        
+        const card = document.createElement('div');
+        card.className = `group flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all ${activeClass}`;
+        card.setAttribute('onclick', `loadChatSession('${item.id}')`);
+        
+        // Render content markup
+        card.innerHTML = `
+          <div class="flex items-center gap-2 overflow-hidden w-full mr-2">
+            <i class="fa-solid fa-message text-[11px] flex-shrink-0 text-indigo-500/80"></i>
+            <span class="text-xs truncate text-left w-full">${item.title}</span>
+          </div>
+          <button onclick="deleteSession(event, '${item.id}')" class="p-1 rounded text-slate-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-300/30 dark:hover:bg-slate-800/40 flex-shrink-0" title="Delete conversation">
+            <i class="fa-solid fa-xmark text-[10px]"></i>
+          </button>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    function deleteSession(e, id) {
+      e.stopPropagation();
+      const confirmed = confirm('Are you sure you want to delete this chat session?');
+      if (!confirmed) return;
+
+      chatHistory = chatHistory.filter(h => h.id !== id);
+      localStorage.setItem('col_ai_history', JSON.stringify(chatHistory));
+
+      if (currentSessionId === id) {
+        currentSessionId = '';
+        localStorage.removeItem('col_ai_current_session_id');
+        createNewChat();
+      } else {
+        renderHistoryList();
+      }
+      showToast('Study session historical items removed', 'fa-trash-can');
+    }
+
+    function resetConversation() {
+      if (currentMessages.length === 0) return;
+      const confirmReset = confirm('Reset screen session and start a new chat?');
+      if (confirmReset) {
+        createNewChat();
+      }
+    }
+
+    // Suggested prompt loading sequence based on Active profile configurations
+    function populateWelcomePrompts() {
+      const pVal = document.getElementById('personality-select').value;
+      const promptsGrid = document.getElementById('prompts-grid-dynamic');
+      
+      promptsGrid.innerHTML = '';
+      const selectedPresets = promptPresets[pVal] || promptPresets["Mentor"];
+      
+      selectedPresets.forEach(preset => {
+        const card = document.createElement('div');
+        card.className = "p-3.5 bg-panel-light dark:bg-panel-dark hover:bg-indigo-50/50 dark:hover:bg-indigo-950/25 border border-gray-150 dark:border-slate-800/60 hover:border-indigo-200 dark:hover:border-indigo-900 rounded-xl cursor-pointer transition-all active:scale-[0.98] group flex items-start gap-3 shadow-sm";
+        card.setAttribute('onclick', `selectSuggestedPrompt('${preset.text}')`);
+        
+        card.innerHTML = `
+          <div class="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 transition-colors flex-shrink-0">
+            <i class="fa-solid ${preset.icon} text-xs"></i>
+          </div>
+          <div class="flex-1">
+            <p class="text-xs text-slate-700 dark:text-slate-300 font-medium leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">${preset.text}</p>
+          </div>
+        `;
+        promptsGrid.appendChild(card);
+      });
+    }
+
+    function selectSuggestedPrompt(text) {
+      const field = document.getElementById('chat-input');
+      field.value = text;
+      resizeTextarea();
+      field.focus();
+    }
+
+    // Direct Interactive Submit
+    async function handleChatSubmit(event) {
+      event.preventDefault();
+      if (isAILoading) return;
+
+      const input = document.getElementById('chat-input');
+      const messageText = input.value.trim();
+      
+      if (!messageText) return;
+
+      // Ensure system welcome messages hide during active dialogs
+      document.getElementById('welcome-prompter').classList.add('hidden');
+
+      // Clear layout fields
+      input.value = '';
+      resizeTextarea();
+
+      // Configure tracking structures
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      injectMessageUI('user', messageText, timestamp, true);
+      
+      // Save user payload state
+      currentMessages.push({
+        role: 'user',
+        content: messageText,
+        timestamp: timestamp
+      });
+      
+      document.getElementById('current-chat-title').textContent = getSessionTitle();
+      saveCurrentSessionProperties();
+
+      // Call API sequence
+      await dispatchAIChatRequest(messageText);
+    }
+
+    // Back-end execution proxy logic
+    async function dispatchAIChatRequest(prompt) {
+      toggleAILoadingState(true);
+      
+      const activePersona = document.getElementById('personality-select').value;
+      const activeExamMode = document.getElementById('exam-mode-select').value;
+      
+      const payload = {
+        message: prompt,
+        personality: activePersona,
+        exam_mode: activeExamMode,
+        history: currentMessages, // Pass history in case endpoint leverages context
+        attached_pdf: uploadedFileDetails ? uploadedFileDetails.filename : null,
+        pdf_meta: uploadedFileDetails || null
+      };
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Server returned error code: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const responseText = data.response || "No reply was generated by the endpoint service. Verify connection configurations.";
+        const aiTimeLabel = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        injectMessageUI('ai', responseText, aiTimeLabel, true);
+        
+        currentMessages.push({
+          role: 'ai',
+          content: responseText,
+          timestamp: aiTimeLabel
+        });
+        
+        saveCurrentSessionProperties();
+      } catch (err) {
+        console.error('API integration interface triggered an exception:', err);
+        const errMessage = "I apologize, but I am unable to connect with my servers at this time due to a temporary disruption. Please ensure the backend server route `/api/chat` is online.";
+        const errTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        injectMessageUI('ai', errMessage, errTime, true);
+        
+        currentMessages.push({
+          role: 'ai',
+          content: errMessage,
+          timestamp: errTime
+        });
+        
+        showToast('Connection disruption. Check server status.', 'fa-circle-exclamation');
+        saveCurrentSessionProperties();
+      } finally {
+        toggleAILoadingState(false);
+      }
+    }
+
+    function toggleAILoadingState(loading) {
+      isAILoading = loading;
+      const indicator = document.getElementById('ai-loading-indicator');
+      const submitBtn = document.getElementById('submit-btn');
+      const statusText = document.getElementById('current-status-text');
+      const stateLight = document.getElementById('status-ledger-light');
+
+      if (loading) {
+        indicator.classList.remove('hidden');
+        submitBtn.disabled = true;
+        statusText.textContent = 'Assistant is studying...';
+        stateLight.className = 'flex-shrink-0 w-3 h-3 rounded-full bg-amber-500 animate-pulse';
+        scrollToLatestMessage();
+      } else {
+        indicator.classList.add('hidden');
+        submitBtn.disabled = false;
+        statusText.textContent = 'Assistant is Ready';
+        stateLight.className = 'flex-shrink-0 w-3 h-3 rounded-full bg-emerald-500 animate-pulse';
+        scrollToLatestMessage();
+      }
+      resizeTextarea();
+    }
+
+    // Elegant DOM dialog generators mimicking modern ChatGPT/Claude designs
+    function injectMessageUI(role, content, timestamp, useAnimation) {
+      const dialogRoot = document.getElementById('dialog-root');
+      const container = document.createElement('div');
+      
+      const isAI = role === 'ai';
+      container.className = `flex gap-4 w-full ${isAI ? 'justify-start mr-auto' : 'justify-end ml-auto'} ${useAnimation ? 'animate-fade-in' : ''}`;
+      
+      const timeTag = `<span class="block text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium">${timestamp}</span>`;
+      
+      if (isAI) {
+        // Construct markdown markup
+        const formattedHTML = parseMarkdownContent(content);
+        
+        container.innerHTML = `
+          <!-- Avatar Icon -->
+          <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-indigo-500/10 dark:bg-indigo-400/10 border border-indigo-200/30 dark:border-indigo-800/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm self-start">
+            <i class="fa-solid fa-graduation-cap text-sm"></i>
+          </div>
+          <!-- Answer Bubble frame -->
+          <div class="flex-1 max-w-[85%] space-y-1 group">
+            <div class="bg-panel-light dark:bg-panel-dark/90 border border-gray-200/60 dark:border-slate-800/80 p-4 rounded-2xl shadow-sm text-sm text-slate-800 dark:text-slate-200 leading-relaxed markdown-content">
+              ${formattedHTML}
+            </div>
+            <div class="flex items-center gap-3 mt-1.5 px-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200">
+              <button onclick="copyToClipboard(this)" class="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center gap-1 font-semibold tracking-wide uppercase transition-colors" title="Copy response text">
+                <i class="fa-regular fa-copy text-[11px]"></i>
+                <span class="copy-label">Copy</span>
+              </button>
+              <span class="text-slate-300 dark:text-slate-700 text-[10px]">&bull;</span>
+              ${timeTag}
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <!-- Question Bubble Frame -->
+          <div class="flex-1 max-w-[85%] flex flex-col items-end">
+            <div class="bg-indigo-600 dark:bg-indigo-600/90 text-white p-3.5 px-4 rounded-2xl rounded-tr-sm shadow-md text-sm leading-relaxed whitespace-pre-wrap select-text">
+              ${escapeHTML(content)}
+            </div>
+            ${timeTag}
+          </div>
+        `;
+      }
+
+      dialogRoot.appendChild(container);
+      
+      // Perform code blocks post-rendering setup highlight.js hook
+      if (isAI) {
+        container.querySelectorAll('pre code').forEach((block) => {
+          hljs.highlightElement(block);
+        });
+      }
+      
+      scrollToLatestMessage();
+    }
+
+    // Markdown Parser utilizing marked.js configuration & Custom block structures
+    function parseMarkdownContent(rawText) {
+      if (!window.marked) return escapeHTML(rawText).replace(/\n/g, '<br>');
+      
+      // Setup marked renderer configuration overrides for custom styling of code containers
+      const customRenderer = new marked.Renderer();
+      
+      customRenderer.code = function(code, language) {
+        const langString = language || 'plaintext';
+        const uuid = 'code_' + Math.random().toString(36).substring(2, 9);
+        return `
+          <div class="code-container my-3 rounded-lg overflow-hidden border border-slate-700/80">
+            <div class="code-header flex items-center justify-between text-xs px-4 py-2 bg-slate-900 border-b border-slate-800 text-slate-400">
+              <span>${langString}</span>
+              <button onclick="copySpecificCode('${uuid}')" id="${uuid}-btn" class="flex items-center gap-1 hover:text-white transition-colors">
+                <i class="fa-regular fa-copy"></i>
+                <span>Copy Code</span>
+              </button>
+            </div>
+            <pre class="m-0 bg-slate-950 p-4 overflow-x-auto text-[13px] leading-relaxed"><code class="${langString}" id="${uuid}">${escapeHTML(code)}</code></pre>
+          </div>
+        `;
+      };
+
+      try {
+        return marked.parse(rawText, { renderer: customRenderer });
+      } catch (err) {
+        console.error('Markdown processing triggered failure fallback:', err);
+        return escapeHTML(rawText);
+      }
+    }
+
+    function escapeHTML(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    // Scroll helpers targeting smooth messaging layouts
+    function scrollToLatestMessage() {
+      const container = document.getElementById('chat-messages-container');
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+
+    // Copy Interactions
+    function copySpecificCode(elementId) {
+      const codeEl = document.getElementById(elementId);
+      const btn = document.getElementById(`${elementId}-btn`);
+      
+      if (!codeEl) return;
+
+      navigator.clipboard.writeText(codeEl.textContent).then(() => {
+        btn.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> <span class="text-emerald-400">Copied!</span>`;
+        showToast('Code block saved to clipboard', 'fa-code');
+        setTimeout(() => {
+          btn.innerHTML = `<i class="fa-regular fa-copy"></i> <span>Copy Code</span>`;
+        }, 2000);
+      }).catch(err => {
+        showToast('Clipboard copy failed. Try copying manually.', 'fa-triangle-exclamation');
+      });
+    }
+
+    function copyToClipboard(buttonElement) {
+      const textContainer = buttonElement.closest('.group').querySelector('.markdown-content');
+      const label = buttonElement.querySelector('.copy-label');
+      
+      if (!textContainer) return;
+
+      navigator.clipboard.writeText(textContainer.innerText).then(() => {
+        label.textContent = 'Copied!';
+        showToast('Assistant message text copied to clipboard', 'fa-copy');
+        setTimeout(() => {
+          label.textContent = 'Copy';
+        }, 2000);
+      }).catch(err => {
+        showToast('Clipboard copy failed', 'fa-triangle-exclamation');
+      });
+    }
+
+    // Custom Interactive Toast Interface
+    function showToast(message, iconClass) {
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toast-message');
+      const toastIcon = document.getElementById('toast-icon');
+      
+      toastText.textContent = message;
+      if (iconClass) {
+        toastIcon.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+      } else {
+        toastIcon.innerHTML = `<i class="fa-solid fa-info"></i>`;
+      }
+      
+      toast.classList.remove('hidden');
+      
+      // Auto dismiss
+      if (window.toastTimeout) clearTimeout(window.toastTimeout);
+      window.toastTimeout = setTimeout(() => {
+        closeToast();
+      }, 4000);
+    }
+
+    function closeToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

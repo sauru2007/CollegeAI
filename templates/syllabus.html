@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Syllabus Analyzer - College AI</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --primary:#4f46e5;
+      --primary-dark:#4338ca;
+      --bg:#f3f4f6;
+      --panel:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --sidebar:#1f2937;
+      --border:#e5e7eb;
+      --card:#ffffff;
+      --shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+    body.dark{
+      --bg:#0b1220;
+      --panel:#0f172a;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --sidebar:#0f172a;
+      --border:#233047;
+      --card:#0f172a;
+      background: radial-gradient(1200px 600px at 20% 10%, rgba(79,70,229,.25), transparent 50%), var(--bg);
+    }
+    body{
+      margin:0;
+      font-family: Inter, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height:100vh;
+      display:flex;
+      overflow:hidden;
+    }
+    .sidebar{
+      width:260px;
+      background:var(--sidebar);
+      color:white;
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .brand{display:flex; gap:10px; align-items:center; font-weight:800; font-size:1.05rem;}
+    .nav a{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      text-decoration:none;
+      color:white;
+      opacity:.9;
+    }
+    .nav a:hover{background:rgba(255,255,255,.08); opacity:1;}
+    .spacer{flex:1;}
+    .main{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      overflow:auto;
+    }
+    .topbar{
+      background: rgba(255,255,255,.75);
+      border-bottom:1px solid var(--border);
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      backdrop-filter: blur(8px);
+    }
+    body.dark .topbar{background: rgba(15,23,42,.75);}
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .btn.primary{background:var(--primary); color:white;}
+    .btn.primary:hover{background:var(--primary-dark);}
+    .btn.ghost{background:transparent; color:inherit; border:1px solid var(--border);}
+    .btn.ghost:hover{background:rgba(79,70,229,.08)}
+    .content{padding:18px;}
+    .grid{display:grid; grid-template-columns: repeat(12, 1fr); gap:14px;}
+    .col-8{grid-column: span 8;}
+    .col-4{grid-column: span 4;}
+    .card{
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    h3{margin:0 0 10px;}
+    .muted{color:var(--muted)}
+    textarea{
+      width:100%;
+      min-height:150px;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background: transparent;
+      color:inherit;
+      outline:none;
+      resize: vertical;
+    }
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      background: rgba(79,70,229,.08);
+      border:1px solid rgba(79,70,229,.25);
+      font-weight:800;
+      color: var(--primary);
+    }
+    pre{
+      white-space:pre-wrap;
+      word-break:break-word;
+      background: rgba(0,0,0,.08);
+      padding:12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      max-height: 420px;
+      overflow:auto;
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><i class="fa-solid fa-graduation-cap"></i> College AI</div>
+    <div class="nav">
+      <a href="/dashboard"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="/"><i class="fa-solid fa-comments"></i> Chat</a>
+      <a href="/syllabus"><i class="fa-solid fa-book"></i> Syllabus Analyzer</a>
+      <a href="#" onclick="alert('Study Planner coming soon')"><i class="fa-solid fa-list-check"></i> Study Planner</a>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn ghost" id="themeBtn" type="button"><i class="fa-solid fa-moon"></i> Theme</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div style="font-weight:900;">Syllabus Analyzer</div>
+        <div class="muted" style="font-size:.9rem;">Select a previously uploaded syllabus and analyze</div>
+      <button class="btn ghost" id="logoutBtn" type="button"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+
+    <div class="content">
+      <div class="grid">
+        <div class="col-8">
+          <div class="card">
+            <h3>Analyze your syllabus (AI)</h3>
+
+            <div class="row" style="margin-top:6px;">
+              <span class="pill"><i class="fa-solid fa-file-pdf"></i> PDF from your uploads</span>
+            </div>
+
+            <div class="muted" style="margin-top:10px; font-size:.9rem;">
+              MVP: Use <b>document_id</b> from your database. (Next phase will show an upload picker list.)
+            </div>
+
+            <div class="row" style="margin-top:12px;">
+              <input id="documentId" type="number" placeholder="document_id" style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--border); background:transparent; color:inherit; outline:none;" />
+              <button class="btn primary" id="analyzeBtn" type="button">
+                <i class="fa-solid fa-wand-magic-sparkles" style="margin-right:8px;"></i> Analyze
+              </button>
+            </div>
+
+            <div id="status" class="muted" style="margin-top:12px;"></div>
+
+            <div style="margin-top:12px;">
+              <h3 style="margin-top:0;">Output (structured JSON)</h3>
+              <pre id="output">{}</pre>
+            </div>
+        </div>
+
+        <div class="col-4">
+          <div class="card">
+            <h3>How it works</h3>
+            <ul style="margin:0; padding-left:18px; color:var(--muted); line-height:1.6;">
+              <li>Extracts text from the PDF</li>
+              <li>LLM returns JSON (units, topics, difficulty, weightage, order)</li>
+              <li>Saves the analysis in SQLite</li>
+            </ul>
+            <div class="muted" style="margin-top:12px; font-size:.9rem;">
+              Tip: Upload a syllabus in <b>Dashboard</b> first.
+            </div>
+        </div>
+    </div>
+  </main>
+
+  <script>
+    const themeBtn = document.getElementById('themeBtn');
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      const icon = themeBtn.querySelector('i');
+      if (document.body.classList.contains('dark')) icon.className = 'fa-solid fa-sun';
+      else icon.className = 'fa-solid fa-moon';
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await fetch('/auth/api/logout', { method: 'POST' });
+      window.location.href = '/auth/login';
+    });
+
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const statusEl = document.getElementById('status');
+    const outputEl = document.getElementById('output');
+
+    analyzeBtn.addEventListener('click', async () => {
+      const docId = document.getElementById('documentId').value;
+      if (!docId) {
+        statusEl.textContent = 'Enter document_id first.';
+        return;
+      }
+
+      statusEl.textContent = 'Analyzing...';
+      outputEl.textContent = '{}';
+
+      const res = await fetch('/api/syllabus/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ document_id: Number(docId) })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        statusEl.textContent = data.error || 'Analyze failed.';
+        return;
+      }
+
+      statusEl.textContent = '✅ Analysis complete.';
+      outputEl.textContent = JSON.stringify(data, null, 2);
+    });
+  </script>
+</body>
+</html>

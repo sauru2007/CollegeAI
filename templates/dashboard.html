@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - College AI Assistant</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --primary:#4f46e5;
+      --primary-dark:#4338ca;
+      --bg:#f3f4f6;
+      --panel:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --sidebar:#1f2937;
+      --border:#e5e7eb;
+      --card:#ffffff;
+      --shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+    body{
+      margin:0;
+      font-family: Inter, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color:var(--text);
+      height:100vh;
+      display:flex;
+      overflow:hidden;
+    }
+
+    body.dark{
+      --bg:#0b1220;
+      --panel:#0f172a;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --sidebar:#0f172a;
+      --border:#233047;
+      --card:#0f172a;
+      background: radial-gradient(1200px 600px at 20% 10%, rgba(79,70,229,.25), transparent 50%), var(--bg);
+    }
+
+    .sidebar{
+      width:260px;
+      background:var(--sidebar);
+      color:white;
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .brand{display:flex; gap:10px; align-items:center; font-weight:800; font-size:1.05rem;}
+    .nav a{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      text-decoration:none;
+      color:white;
+      opacity:.9;
+    }
+    .nav a:hover{background:rgba(255,255,255,.08); opacity:1;}
+
+    .spacer{flex:1;}
+
+    .main{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      overflow:auto;
+    }
+
+    .topbar{
+      background: rgba(255,255,255,.75);
+      border-bottom:1px solid var(--border);
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      backdrop-filter: blur(8px);
+    }
+    body.dark .topbar{background: rgba(15,23,42,.75);}
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .btn.primary{background:var(--primary); color:white;}
+    .btn.primary:hover{background:var(--primary-dark);}
+    .btn.ghost{background:transparent; color:inherit; border:1px solid var(--border);}
+    .btn.ghost:hover{background:rgba(79,70,229,.08)}
+
+    .content{padding:18px;}
+
+    .grid{display:grid; grid-template-columns: repeat(12, 1fr); gap:14px;}
+    .col-4{grid-column: span 4;}
+    .col-8{grid-column: span 8;}
+    .card{
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .card h3{margin:0 0 10px; font-size:1rem;}
+    .stat{font-size:2rem; font-weight:900;}
+    .muted{color:var(--muted)}
+
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+
+    .upload{
+      border:1px dashed rgba(79,70,229,.45);
+      border-radius:16px;
+      padding:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      background: rgba(79,70,229,.05);
+    }
+    .upload input{display:none;}
+    .upload label{cursor:pointer; color:var(--primary); font-weight:800;}
+
+    .chat-link{
+      text-decoration:none;
+      color: var(--primary);
+      font-weight:900;
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><i class="fa-solid fa-graduation-cap"></i> College AI</div>
+    <div class="nav">
+      <a href="/dashboard"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a href="/chat"><i class="fa-solid fa-comments"></i> Chat</a>
+      <a href="#" onclick="alert('Feature coming in Phase 2')"><i class="fa-solid fa-book"></i> Documents</a>
+      <a href="#" onclick="alert('Feature coming in Phase 2')"><i class="fa-solid fa-list-check"></i> Study Planner</a>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn ghost" id="themeBtn" type="button"><i class="fa-solid fa-moon"></i> Theme</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div style="font-weight:900;">Hi, {{ user_name }} 👋</div>
+        <div class="muted" style="font-size:.9rem;">MVP: Auth + PDF → FAISS RAG + Chat</div>
+      </div>
+      <button class="btn ghost" id="logoutBtn" type="button"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+
+    <div class="content">
+      <div class="grid">
+        <div class="card col-4">
+          <h3>Uploaded PDFs</h3>
+          <div class="stat">{{ documents_count }}</div>
+          <div class="muted">Total documents indexed in FAISS</div>
+        </div>
+        <div class="card col-4">
+          <h3>Questions Asked</h3>
+          <div class="stat">{{ questions_count }}</div>
+          <div class="muted">Saved user messages</div>
+        </div>
+        <div class="card col-4">
+          <h3>AI Chat</h3>
+          <div class="muted" style="line-height:1.5;">Open the Chat page to ask questions from your PDFs.</div>
+          <div class="row" style="margin-top:12px;">
+            <a class="chat-link" href="/chat">Go to Chat →</a>
+          </div>
+        </div>
+
+        <div class="card col-8">
+          <h3>Upload a PDF (FAISS indexing)</h3>
+          <div class="upload" style="margin-top:6px;">
+            <div>
+              <div style="font-weight:900;">PDF Upload</div>
+              <div class="muted" style="font-size:.9rem; margin-top:4px;">We extract text, chunk it, embed, and store vectors for retrieval.</div>
+            </div>
+            <div class="row">
+              <label for="pdfInput"><i class="fa-solid fa-file-arrow-up" style="margin-right:8px;"></i> Choose file</label>
+              <input id="pdfInput" type="file" accept=".pdf" />
+              <button class="btn primary" type="button" id="uploadBtn"><i class="fa-solid fa-upload" style="margin-right:8px;"></i> Upload</button>
+            </div>
+          </div>
+          <div id="uploadStatus" class="muted" style="margin-top:12px; font-size:.95rem;"></div>
+        </div>
+
+        <div class="card col-4">
+          <h3>Recent Activity</h3>
+          <div class="muted">Coming in Phase 2 (charts + history feed)</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+   const themeBtn = document.getElementById('themeBtn');
+
+if(localStorage.getItem('theme') === 'dark'){
+    document.body.classList.add('dark');
+}
+
+themeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+
+    if(document.body.classList.contains('dark')){
+        localStorage.setItem('theme', 'dark');
+    } else {
+        localStorage.setItem('theme', 'light');
+    }
+});
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await fetch('/auth/api/logout', { method: 'POST' });
+      window.location.href = '/auth/login';
+    });
+
+    const pdfInput = document.getElementById('pdfInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    uploadBtn.addEventListener('click', async () => {
+      const file = pdfInput.files[0];
+      if (!file) {
+        uploadStatus.textContent = 'Select a PDF file first.';
+        return;
+      }
+
+      uploadStatus.textContent = 'Indexing...';
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        uploadStatus.textContent = data.error || 'Upload failed.';
+        uploadStatus.style.color = '#f87171';
+        return;
+      }
+
+      uploadStatus.style.color = '#10b981';
+      uploadStatus.textContent = `✅ Uploaded and indexed: ${file.name} (${data.chunksIndexed || 0} chunks)`;
+      setTimeout(() => location.reload(), 800);
+    });
+  </script>
+</body>
+</html>
+
