@@ -1,198 +1,272 @@
-# 🎓 CollegeAI
-### Your Intelligent AI Powered Campus Companion
+<div align="center">
 
-<p align="center">
+# 🎓 CollegeAI
+
+### Intelligent AI-Powered Campus Companion
+
+<p>
+An AI assistant that helps students interact with academic documents using Retrieval Augmented Generation (RAG), semantic search, and Large Language Models.
+</p>
+
+<p>
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge)
-![Flask](https://img.shields.io/badge/Flask-Web%20Framework-black?style=for-the-badge)
-![SQLite](https://img.shields.io/badge/Database-SQLite-green?style=for-the-badge)
-![FAISS](https://img.shields.io/badge/Vector%20Search-FAISS-red?style=for-the-badge)
-![LLM](https://img.shields.io/badge/LLM-Groq-purple?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-orange?style=for-the-badge)
+![Flask](https://img.shields.io/badge/Flask-Backend-black?style=for-the-badge)
+![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-red?style=for-the-badge)
+![SQLite](https://img.shields.io/badge/SQLite-Database-green?style=for-the-badge)
+![Groq](https://img.shields.io/badge/Groq-LLM-purple?style=for-the-badge)
+![RAG](https://img.shields.io/badge/RAG-Enabled-orange?style=for-the-badge)
 
 </p>
 
 ---
 
-## 📖 Overview
+### 🚀 AI Powered • Semantic Search • Document Chat • Study Planner
 
-CollegeAI is an AI powered campus companion designed to simplify academic life.
+</div>
 
-Instead of manually searching through notes, PDFs and course material, students can upload their documents and interact with them using natural language.
+---
 
-The assistant retrieves relevant information using Retrieval Augmented Generation (RAG), semantic search and Large Language Models to provide fast and accurate academic assistance.
+# 📖 Overview
+
+CollegeAI is a full-stack AI-powered academic assistant built to help students understand, search, and interact with their study materials.
+
+Instead of manually reading lengthy PDFs, students can upload documents and ask questions in natural language. The application retrieves relevant information using semantic search and generates context-aware responses using Large Language Models.
+
+The project combines modern AI techniques such as Retrieval Augmented Generation (RAG), vector databases, embeddings, and conversational AI into a single academic platform.
 
 ---
 
 # ✨ Features
 
-✅ AI Chat Assistant
+## 🤖 AI Assistant
 
-✅ PDF Upload & Processing
-
-✅ Retrieval Augmented Generation (RAG)
-
-✅ FAISS Vector Database
-
-✅ Semantic Search
-
-✅ Student Authentication
-
-✅ Dashboard Analytics
-
-✅ Study Planner
-
-✅ Syllabus Analyzer
-
-✅ Chat History
-
-✅ Dark Theme UI
+- AI powered academic chatbot
+- Multiple assistant personas
+- Interactive conversation history
+- Context-aware responses
 
 ---
 
-# 🖥️ Screenshots
+## 📄 Smart PDF Processing
+
+- Upload PDF documents
+- Automatic text extraction
+- Intelligent chunking
+- Semantic indexing
+- Multiple document support
+
+---
+
+## 🧠 Retrieval Augmented Generation (RAG)
+
+- Sentence Transformer embeddings
+- FAISS vector database
+- Semantic similarity search
+- Context retrieval
+- Accurate grounded responses
+
+---
+
+## 🎓 Student Dashboard
+
+- User authentication
+- Document statistics
+- Chat analytics
+- Recent activity
+- Theme switching
+
+---
+
+## 📚 Academic Tools
+
+- Study Planner
+- Syllabus Analyzer
+- AI Mentor
+- General Chat
+- Academic Tutor
+
+---
+
+## 🔐 Authentication
+
+- Login
+- Registration
+- Session management
+
+---
+
+# 🖼️ Application Preview
+
+## Login Page
+
+![](screenshots/login-dark.png)
+
+---
 
 ## Dashboard
 
-![Dashboard](screenshots/dashboard.png)
+![](screenshots/dashboard-dark.png)
 
 ---
 
-## AI Chat Interface
+## AI Chat
 
-![Chat](screenshots/chat.png)
+![](screenshots/chat-dark.png)
 
 ---
 
-# 🚀 How it Works
+## Document Analysis
+
+![](screenshots/document-chat.png)
+
+---
+
+## Light Theme
+
+![](screenshots/dashboard-light.png)
+
+---
+
+# 🏗️ System Architecture
 
 ```
-Student
-     │
-     ▼
-Upload PDF
-     │
-     ▼
-Extract Text
-     │
-     ▼
-Chunking
-     │
-     ▼
-Embeddings
-(Sentence Transformers)
-     │
-     ▼
-FAISS Vector Database
-     │
-     ▼
-Semantic Retrieval
-     │
-     ▼
-Groq LLM
-     │
-     ▼
-AI Generated Answer
+                Student
+
+                   │
+
+                   ▼
+
+             Upload PDF
+
+                   │
+
+                   ▼
+
+          Text Extraction
+
+                   │
+
+                   ▼
+
+             Text Chunking
+
+                   │
+
+                   ▼
+
+     Sentence Transformers
+
+                   │
+
+                   ▼
+
+         FAISS Vector Store
+
+                   │
+
+                   ▼
+
+      Relevant Context Search
+
+                   │
+
+                   ▼
+
+            Groq LLM API
+
+                   │
+
+                   ▼
+
+          AI Generated Answer
 ```
 
 ---
 
-# 🛠 Tech Stack
+# 🛠 Technology Stack
 
-### Backend
+## Backend
 
 - Python
 - Flask
-- SQLite
 - SQLAlchemy
-
-### AI
-
-- Groq API
-- Sentence Transformers
-- FAISS
-- RAG Pipeline
-
-### Frontend
-
-- HTML
-- CSS
-- JavaScript
-
-### Authentication
-
-- Flask Session
-- User Login
-- User Registration
+- SQLite
 
 ---
 
-# 📂 Project Structure
+## Artificial Intelligence
+
+- Groq API
+- FAISS
+- Sentence Transformers
+- Retrieval Augmented Generation
+- Semantic Search
+
+---
+
+## Frontend
+
+- HTML5
+- CSS3
+- JavaScript
+
+---
+
+## Database
+
+- SQLite
+
+---
+
+## Project Structure
 
 ```
-CollegeAI/
-
-│
+CollegeAI
 
 ├── app.py
-
 ├── config.py
-
 ├── requirements.txt
-
 │
-
-├── database/
-
+├── database
 │   ├── db.py
-
 │   └── models.py
-
 │
-
-├── src/
-
-│   ├── auth/
-
-│   ├── chat/
-
-│   └── syllabus/
-
+├── src
+│   ├── auth
+│   ├── chat
+│   ├── rag
+│   ├── services
+│   └── syllabus
 │
-
-├── templates/
-
+├── templates
 │
-
-├── static/
-
+├── static
 │
-
-├── uploads/
-
+├── uploads
 │
-
-└── instance/
-
+├── instance
+│
+└── screenshots
 ```
 
 ---
 
 # ⚙️ Installation
 
-Clone Repository
+Clone repository
 
 ```bash
 git clone https://github.com/sauru2007/CollegeAI.git
 ```
 
-Move into project
+Move into directory
 
 ```bash
 cd CollegeAI
 ```
 
-Create Virtual Environment
+Create virtual environment
 
 ```bash
 python -m venv .venv
@@ -206,19 +280,19 @@ Windows
 .venv\Scripts\activate
 ```
 
-Linux / macOS
+Linux
 
 ```bash
 source .venv/bin/activate
 ```
 
-Install Requirements
+Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run Application
+Run application
 
 ```bash
 python app.py
@@ -232,7 +306,7 @@ http://127.0.0.1:5000
 
 ---
 
-# 🔑 Environment Variables
+# Environment Variables
 
 Create
 
@@ -243,28 +317,13 @@ Create
 Example
 
 ```env
-GROQ_API_KEY=your_api_key_here
 SECRET_KEY=your_secret_key
+GROQ_API_KEY=your_api_key
 ```
 
 ---
 
-# 📚 Current Modules
-
-| Module | Status |
-|---------|---------|
-| Authentication | ✅ |
-| Dashboard | ✅ |
-| AI Chat | ✅ |
-| PDF Upload | ✅ |
-| FAISS Search | ✅ |
-| Study Planner | ✅ |
-| Syllabus Analyzer | ✅ |
-| User Sessions | ✅ |
-
----
-
-# 🧠 AI Pipeline
+# AI Pipeline
 
 ```
 User Question
@@ -275,100 +334,66 @@ Embedding Generation
 
 ↓
 
-Semantic Search (FAISS)
+Semantic Search
 
 ↓
 
-Relevant PDF Chunks
+Relevant Chunks
 
 ↓
 
-LLM Prompt
+Prompt Construction
 
 ↓
 
-Groq API
+Groq LLM
 
 ↓
 
-Final Response
+Generated Answer
 ```
 
 ---
 
-# 🎯 Future Roadmap
+# Current Modules
 
+| Module | Status |
+|----------|----------|
+| Authentication | ✅ |
+| Dashboard | ✅ |
+| PDF Upload | ✅ |
+| AI Chat | ✅ |
+| RAG Pipeline | ✅ |
+| FAISS Search | ✅ |
+| Study Planner | ✅ |
+| Syllabus Analyzer | ✅ |
+
+---
+
+# Future Enhancements
+
+- Voice Assistant
 - OCR Support
-- Voice Chat
-- Multi Language Support
-- Timetable Generator
+- Campus Navigation
 - Attendance Prediction
 - Assignment Generator
-- Mobile Application
-- Teacher Dashboard
-- Student Analytics
-- Cloud Database
-- Multi PDF Search
-- Image Understanding
 - AI Resume Builder
-- Campus Navigation
-- Notes Recommendation Engine
+- Mobile Application
+- Multi-language Support
+- Calendar Integration
+- Teacher Dashboard
+- Cloud Deployment
+- Docker Support
 
 ---
 
-# 📊 Highlights
+# Author
 
-- Secure Authentication
-- Retrieval Augmented Generation
-- Semantic Search
-- Fast Response Generation
-- Clean Modern UI
-- Modular Architecture
-- Easily Extendable
-
----
-
-# 🤝 Contributing
-
-Contributions are welcome.
-
-1. Fork the repository
-
-2. Create a feature branch
-
-```
-git checkout -b feature-name
-```
-
-3. Commit
-
-```
-git commit -m "Added feature"
-```
-
-4. Push
-
-```
-git push origin feature-name
-```
-
-5. Create a Pull Request
-
----
-
-# 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-# 👨‍💻 Author
-
-**Sidharth Pandey**
+## Sidharth Pandey
 
 BCA Student
 
-AI • Machine Learning • Software Development
+AI | Machine Learning | Software Development
 
 GitHub
 
@@ -376,10 +401,14 @@ https://github.com/sauru2007
 
 ---
 
-## ⭐ Support
+# License
+
+MIT License
+
+---
+
+# Support
 
 If you found this project useful,
 
 ⭐ Star this repository.
-
-It helps others discover the project and supports future development.
